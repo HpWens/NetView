@@ -15,8 +15,10 @@ import android.view.WindowManager;
  */
 public class NetView extends View {
 
-    private String[] textArr = new String[]{"攻击", "防御", "爆发力", "抗性", "输出力", "群攻", "单挑", "生存能力", "生存能力"};
-    private float[] overlayPercentArr = new float[]{0.5f, 0.8f, 0.3f, 0.3f, 0.9f, 0.6f, 0.7f, 1.0f, 0.1f};
+    private NetViewAttrs netViewAttrs;
+
+    private String[] textArr = new String[]{"数学", "语文", "外语", "地理", "历史", "化学"};
+    private float[] overlayPercentArr = new float[]{0.2f, 0.5f, 0.9f, 0.6f, 0.7f, 1.0f, 0.4f};
 
     private Paint netPaint;
     private Paint textPaint;
@@ -26,14 +28,14 @@ public class NetView extends View {
     private int centerPointY;
 
     private float maxRadius;  //最大圆半径
-    private int overlayAlpha = 126;  // 0 ~255
+    private int overlayAlpha;  // 0 ~255
     private int arrCount;
 
-    private int netColor = Color.parseColor("#3F51B5");
-    private int textColor = Color.parseColor("#FF4081");
-    private int overlayColor = Color.parseColor("#FFFF00");
-
-    public float netLineWidth = 1f;
+    private int textSize;
+    private int netColor;
+    private int textColor;
+    private int overlayColor;
+    public int netLineWidth;
 
     private final static float RADIUS_SCALE = 0.7f;
 
@@ -43,17 +45,25 @@ public class NetView extends View {
     }
 
     public NetView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
         init(context);
     }
 
     public NetView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        netViewAttrs = new NetViewAttrs(context, attrs, defStyleAttr);
         init(context);
     }
 
     public void init(Context context) {
         arrCount = Math.min(textArr.length, overlayPercentArr.length);
+
+        netColor = netViewAttrs.getNetColor();
+        textColor = netViewAttrs.getTextColor();
+        overlayColor = netViewAttrs.getOverlayColor();
+        overlayAlpha = netViewAttrs.getOverlayAlpha();
+        netLineWidth = netViewAttrs.getLineWidth();
+        textSize = netViewAttrs.getTextSize();
 
         netPaint = new Paint();
         netPaint.setAntiAlias(true);
@@ -63,7 +73,7 @@ public class NetView extends View {
 
         textPaint = new Paint();
         textPaint.setAntiAlias(true);
-        textPaint.setTextSize(32);
+        textPaint.setTextSize(textSize);
         textPaint.setStyle(Paint.Style.FILL);
         textPaint.setColor(textColor);
 
@@ -119,12 +129,12 @@ public class NetView extends View {
                 canvas.drawText(textArr[i], x - textWidth / 2, y + 8, textPaint);
             } else if (angle * i > 90 && angle * i < 270) {
                 canvas.drawText(textArr[i], x - textWidth, y, textPaint);
+            } else if (angle * i > 45 && angle * i < 90) {
+                canvas.drawText(textArr[i], x - textWidth / 2, y + 8, textPaint);
             } else {
                 canvas.drawText(textArr[i], x, y, textPaint);
             }
         }
-
-
     }
 
     private void drawOverlay(Canvas canvas) {
